@@ -10,11 +10,14 @@ import {
     LineChartOutlined
 } from '@ant-design/icons';
 import "./index.css";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 
 const Frame: FC = (): ReactElement => {
     const [collapsed, setCollapsed] = useState<boolean>(false);
+
+    const navigate = useNavigate();
 
     const toggle = () => {
         setCollapsed(!collapsed);
@@ -25,19 +28,19 @@ const Frame: FC = (): ReactElement => {
             <Sider trigger={null} collapsible collapsed={collapsed}>
                 <div className="logo" />
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-                    <Menu.Item key="1" icon={<HomeOutlined />}>
+                    <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate("/home")}>
                         主页
                     </Menu.Item>
-                    <Menu.Item key="2" icon={<FileAddOutlined />}>
+                    <Menu.Item key="2" icon={<FileAddOutlined />} onClick={() => navigate("/add")}>
                         新建日报
                     </Menu.Item>
-                    <Menu.Item key="3" icon={<FileSearchOutlined />}>
+                    <Menu.Item key="3" icon={<FileSearchOutlined />} onClick={() => navigate("/manage")}>
                         日报管理
                     </Menu.Item>
-                    <Menu.Item key="4" icon={<LineChartOutlined />}>
+                    <Menu.Item key="4" icon={<LineChartOutlined />} onClick={() => navigate("/statistics")}>
                         数据统计
                     </Menu.Item>
-                    <Menu.Item key="5" icon={<UserOutlined />}>
+                    <Menu.Item key="5" icon={<UserOutlined />} onClick={() => navigate("/user")}>
                         个人中心
                     </Menu.Item>
                 </Menu>
@@ -57,7 +60,7 @@ const Frame: FC = (): ReactElement => {
                         minHeight: 280,
                     }}
                 >
-                    Content
+                    <Outlet />
                 </Content>
             </Layout>
         </Layout>
