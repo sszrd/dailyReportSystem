@@ -9,7 +9,8 @@ const App: FC = (): ReactElement => {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={localStorage.getItem("token") ? <Frame /> : <Navigate to="/login" />} >
+        <Route path="/" element={<Navigate to="/frame" />} />
+        <Route path="/frame" element={<Frame />} >
           <Route path="" element={<div>home</div>} />
           <Route path="home" element={<div>home</div>} />
           <Route path="add" element={<div>add</div>} />
@@ -18,7 +19,8 @@ const App: FC = (): ReactElement => {
           <Route path="user" element={<div>user</div>} />
           <Route path="*" element={<div>home</div>} />
         </Route>
-        <Route path="/login" element={localStorage.getItem("token") ? <Navigate to="/" /> : <Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/frame" />} />
       </Routes>
     </HashRouter>
   )

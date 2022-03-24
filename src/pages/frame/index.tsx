@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useState } from "react";
+import React, { FC, ReactElement, useEffect, useState } from "react";
 import { Layout, Menu } from 'antd';
 import {
     MenuUnfoldOutlined,
@@ -11,13 +11,20 @@ import {
 } from '@ant-design/icons';
 import "./index.css";
 import { Outlet, useNavigate } from "react-router-dom";
+const { ipcRenderer } = window.require("electron");
 
 const { Header, Sider, Content } = Layout;
 
 const Frame: FC = (): ReactElement => {
     const [collapsed, setCollapsed] = useState<boolean>(false);
-
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!localStorage.getItem("token")) {
+            ipcRenderer.send("goto login page");
+            navigate("/login");
+        }
+    }, [])
 
     const toggle = () => {
         setCollapsed(!collapsed);

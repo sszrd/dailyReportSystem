@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, net } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, net } from 'electron';
 import { hostname, port, protocol } from "./constant/env";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 let mainWindow: BrowserWindow;
@@ -9,8 +9,8 @@ if (require('electron-squirrel-startup')) {
 
 const createWindow = (): BrowserWindow => {
   const mainWindow = new BrowserWindow({
-    height: 720,
-    width: 960,
+    width: 1200,
+    height: 900,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -31,14 +31,27 @@ app.on('ready', () => {
   })
 
   ipcMain.on("goto home page", () => {
-    mainWindow.setSize(720, 960);
+    mainWindow.setSize(1200, 900);
     mainWindow.setResizable(true);
   })
 
+  ipcMain.on("show message-box", (event, arg) => {
+    dialog.showMessageBox({
+      type: "info",
+      title: "提示",
+      message: arg,
+      buttons: ["ok"]
+    })
+  })
+
   ipcMain.handle("post", async (event, ...args) => {
-    let body = {};
-    args.forEach(arg => {
-      Object.assign(body, arg);
+    let body = {}, path = "";
+    args.forEach((arg, index) => {
+      if (index === 0) {
+        path = arg;
+      } else {
+        Object.assign(body, arg);
+      }
     })
     return new Promise((resolve, reject) => {
       const request = net.request({
@@ -46,15 +59,13 @@ app.on('ready', () => {
         protocol,
         hostname,
         port,
-        path: '/users/login',
+        path,
       })
-
       request.on("response", (response) => {
         response.on('data', (chunk) => {
           resolve(JSON.parse(chunk.toString()))
         })
       })
-
       request.setHeader("Content-Type", "application/json");
       request.write(JSON.stringify(body));
       request.end();
