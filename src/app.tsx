@@ -1,3 +1,4 @@
+import Home from './pages/home';
 import * as React from 'react';
 import { FC, ReactElement } from 'react';
 import * as ReactDOM from 'react-dom';
@@ -11,13 +12,13 @@ const App: FC = (): ReactElement => {
       <Routes>
         <Route path="/" element={<Navigate to="/frame" />} />
         <Route path="/frame" element={<Frame />} >
-          <Route path="" element={<div>home</div>} />
-          <Route path="home" element={<div>home</div>} />
+          <Route path="" element={<Navigate to="/frame/home" />} />
+          <Route path="home" element={<Home />} />
           <Route path="add" element={<div>add</div>} />
           <Route path="manage" element={<div>manage</div>} />
           <Route path="statistics" element={<div>statistics</div>} />
           <Route path="user" element={<div>user</div>} />
-          <Route path="*" element={<div>home</div>} />
+          <Route path="*" element={<Navigate to="/frame/home" />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<Navigate to="/frame" />} />

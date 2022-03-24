@@ -44,15 +44,7 @@ app.on('ready', () => {
     })
   })
 
-  ipcMain.handle("post", async (event, ...args) => {
-    let body = {}, path = "";
-    args.forEach((arg, index) => {
-      if (index === 0) {
-        path = arg;
-      } else {
-        Object.assign(body, arg);
-      }
-    })
+  ipcMain.handle("post", async (event, path, body, token) => {
     return new Promise((resolve, reject) => {
       const request = net.request({
         method: "POST",
@@ -67,9 +59,29 @@ app.on('ready', () => {
         })
       })
       request.setHeader("Content-Type", "application/json");
+      token && request.setHeader("Authorization", `Bearer ${token}`);
       request.write(JSON.stringify(body));
       request.end();
     })
+  })
+});
+
+ipcMain.handle("get", async (event, path, token) => {
+  return new Promise((resolve, reject) => {
+    const request = net.request({
+      method: "Get",
+      protocol,
+      hostname,
+      port,
+      path,
+    })
+    request.on("response", (response) => {
+      response.on('data', (chunk) => {
+        resolve(JSON.parse(chunk.toString()))
+      })
+    })
+    token && request.setHeader("Authorization", `Bearer ${token}`);
+    request.end();
   })
 });
 
