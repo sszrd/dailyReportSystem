@@ -1,35 +1,29 @@
 import { FC, ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import { Calendar, Badge } from 'antd';
 import React from "react";
-const { ipcRenderer } = window.require("electron");
 import "./index.css";
+import { useNavigate } from "react-router-dom";
+import { IReport } from "../../constant/typings";
+const { ipcRenderer } = window.require("electron");
 
 interface IListData {
     type: "warning" | "success" | "error" | "processing" | "default",
     content: string
 }
 
-interface IResponse {
-    id: number,
-    title: string,
-    finish?: string,
-    unfinish?: string,
-    thinking?: string,
-    time: number,
-    percent?: number,
-    userId: number,
-    createdAt: string,
-    updatedAt: string
-}
-
 const Home: FC = (): ReactElement => {
-    const [response, setResponse] = useState<IResponse[]>([]);
+    const [response, setResponse] = useState<IReport[]>([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         ipcRenderer.invoke("get", "/reports", localStorage.getItem("token"))
             .then(response => {
                 if (response.code === 200) {
                     setResponse(Object.values(response.result));
+                } else if (response.code === 401) {
+                    localStorage.removeItem("token");
+                    ipcRenderer.send("goto login page");
+                    navigate("/login");
                 }
             })
     }, [])

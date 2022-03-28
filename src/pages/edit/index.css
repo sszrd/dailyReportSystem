@@ -1,0 +1,11 @@
+#report_add_time {
+    justify-content: end;
+}
+
+#report_add_percent {
+    justify-content: end;
+}
+
+.add-report-button {
+    float: right;
+}

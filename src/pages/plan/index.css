@@ -1,0 +1,10 @@
+.plan-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-date {
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: bold;
+}

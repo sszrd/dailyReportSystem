@@ -55,7 +55,7 @@ app.on('ready', () => {
       })
       request.on("response", (response) => {
         response.on('data', (chunk) => {
-          resolve(JSON.parse(chunk.toString()))
+          resolve(JSON.parse(chunk.toString()));
         })
       })
       request.setHeader("Content-Type", "application/json");
@@ -77,13 +77,34 @@ ipcMain.handle("get", async (event, path, token) => {
     })
     request.on("response", (response) => {
       response.on('data', (chunk) => {
-        resolve(JSON.parse(chunk.toString()))
+        resolve(JSON.parse(chunk.toString()));
       })
     })
     token && request.setHeader("Authorization", `Bearer ${token}`);
     request.end();
   })
 });
+
+ipcMain.handle("patch", async (event, path, body, token) => {
+  return new Promise((resolve, reject) => {
+    const request = net.request({
+      method: "PATCH",
+      protocol,
+      hostname,
+      port,
+      path,
+    })
+    request.on("response", (response) => {
+      response.on('data', (chunk) => {
+        resolve(JSON.parse(chunk.toString()));
+      })
+    })
+    request.setHeader("Content-Type", "application/json");
+    token && request.setHeader("Authorization", `Bearer ${token}`);
+    request.write(JSON.stringify(body));
+    request.end();
+  })
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

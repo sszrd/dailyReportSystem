@@ -35,19 +35,19 @@ const Frame: FC = (): ReactElement => {
             <Sider trigger={null} collapsible collapsed={collapsed}>
                 <div className="logo" />
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-                    <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate("/home")}>
+                    <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate("/frame/home")}>
                         主页
                     </Menu.Item>
-                    <Menu.Item key="2" icon={<FileAddOutlined />} onClick={() => navigate("/add")}>
-                        新建日报
+                    <Menu.Item key="2" icon={<FileAddOutlined />} onClick={() => navigate("/frame/plan")}>
+                        我的计划
                     </Menu.Item>
-                    <Menu.Item key="3" icon={<FileSearchOutlined />} onClick={() => navigate("/manage")}>
+                    <Menu.Item key="3" icon={<FileSearchOutlined />} onClick={() => navigate("/frame/report")}>
                         日报管理
                     </Menu.Item>
-                    <Menu.Item key="4" icon={<LineChartOutlined />} onClick={() => navigate("/statistics")}>
+                    <Menu.Item key="4" icon={<LineChartOutlined />} onClick={() => navigate("/frame/statistics")}>
                         数据统计
                     </Menu.Item>
-                    <Menu.Item key="5" icon={<UserOutlined />} onClick={() => navigate("/user")}>
+                    <Menu.Item key="5" icon={<UserOutlined />} onClick={() => navigate("/frame/user")}>
                         个人中心
                     </Menu.Item>
                 </Menu>
