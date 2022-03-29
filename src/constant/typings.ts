@@ -17,6 +17,7 @@ export interface IPlan {
     progress: number,
     totalTime: number,
     userId: number,
+    startAt: string,
     deadline: string,
     createdAt: string,
     updatedAt: string,

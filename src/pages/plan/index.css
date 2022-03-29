@@ -4,7 +4,13 @@
 }
 
 .plan-date {
-    margin-bottom: 12px;
+    font-size: 12px;
     text-align: center;
     font-weight: bold;
+}
+
+.btn-plan-add {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: end;
 }

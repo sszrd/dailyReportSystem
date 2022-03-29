@@ -3,6 +3,8 @@ import "./index.css";
 import { Card, Checkbox, Col, Row } from 'antd';
 import { IPlan } from "../../constant/typings";
 import { useNavigate } from "react-router-dom";
+import PlanEditModal from "../../components/planEditModal";
+import { PlusOutlined } from "@ant-design/icons";
 const { ipcRenderer } = window.require("electron");
 
 const Plan: FC = (): ReactElement => {
@@ -40,18 +42,29 @@ const Plan: FC = (): ReactElement => {
 
     return (
         <div className="site-card-wrapper" >
+            <div className="btn-plan-add">
+                <PlanEditModal type="add" />
+            </div>
             <Row gutter={16}>
                 {
                     plans?.map(element => (
                         <Col span={8} key={element.id}>
                             <Card title={element.target}
                                 bordered
-                                extra={<a href="#">编辑</a>}
-                                style={{ width: 400 }}
+                                actions={[
+                                    <PlanEditModal
+                                        type="edit"
+                                        target={element.target}
+                                        date={{ start: element.startAt, end: element.deadline }}
+                                        id={element.id}
+                                        key="edit"
+                                    />,
+                                    <PlusOutlined key="plus" />
+                                ]}
                             >
                                 <div className="plan-card">
                                     <div className="plan-date">
-                                        {`${element.createdAt.substring(0, 10)} - ${element.deadline.substring(0, 10)}`}
+                                        {`${new Date(element.startAt.substring(0, 10)).getFullYear()}年${new Date(element.startAt.substring(0, 10)).getMonth() + 1}月${new Date(element.startAt.substring(0, 10)).getDate()}日 - ${new Date(element.deadline.substring(0, 10)).getFullYear()}年${new Date(element.deadline.substring(0, 10)).getMonth() + 1}月${new Date(element.deadline.substring(0, 10)).getDate()}日`}
                                     </div>
                                     {
                                         element.items?.map(item => (

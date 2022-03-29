@@ -1,8 +1,8 @@
 import { FC, ReactElement, useState } from "react";
-import "./index.css";
 import { Col, Form, Input, InputNumber, Row, Slider, Button } from 'antd';
 import React from "react";
 import TextArea from "antd/lib/input/TextArea";
+import "./ReportEdit.css";
 
 const Add: FC = (): ReactElement => {
     const [form] = Form.useForm();
