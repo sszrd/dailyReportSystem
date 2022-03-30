@@ -1,10 +1,11 @@
 import React, { FC, ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { Card, Checkbox, Col, Row } from 'antd';
+import { Card, Checkbox, Col, Popconfirm, Row } from 'antd';
 import { IPlan } from "../../constant/typings";
 import { useNavigate } from "react-router-dom";
 import PlanEditModal from "../../components/planEditModal";
-import { PlusOutlined } from "@ant-design/icons";
+import ItemEditModal from "../../components/ItemEditModal";
+import { DeleteOutlined, DeleteTwoTone } from '@ant-design/icons';
 const { ipcRenderer } = window.require("electron");
 
 const Plan: FC = (): ReactElement => {
@@ -40,6 +41,17 @@ const Plan: FC = (): ReactElement => {
             })
     }
 
+    const handleDelete = (path: string) => {
+        ipcRenderer.invoke("delete", path, localStorage.getItem("token"))
+            .then(response => {
+                if (response.code === 401) {
+                    localStorage.removeItem("token");
+                    ipcRenderer.send("goto login page");
+                    navigate("/login");
+                }
+            })
+    }
+
     return (
         <div className="site-card-wrapper" >
             <div className="btn-plan-add">
@@ -59,22 +71,51 @@ const Plan: FC = (): ReactElement => {
                                         id={element.id}
                                         key="edit"
                                     />,
-                                    <PlusOutlined key="plus" />
+                                    <ItemEditModal
+                                        type="add"
+                                        planId={element.id}
+                                        key="plus"
+                                    />,
+                                    <Popconfirm
+                                        title="你确定要移除这个计划吗?"
+                                        onConfirm={() => handleDelete(`/plans/${element.id}`)}
+                                        okText="确定"
+                                        cancelText="取消"
+                                    >
+                                        <DeleteOutlined key="delete" />
+                                    </Popconfirm>
+
                                 ]}
                             >
                                 <div className="plan-card">
-                                    <div className="plan-date">
-                                        {`${new Date(element.startAt.substring(0, 10)).getFullYear()}年${new Date(element.startAt.substring(0, 10)).getMonth() + 1}月${new Date(element.startAt.substring(0, 10)).getDate()}日 - ${new Date(element.deadline.substring(0, 10)).getFullYear()}年${new Date(element.deadline.substring(0, 10)).getMonth() + 1}月${new Date(element.deadline.substring(0, 10)).getDate()}日`}
-                                    </div>
                                     {
                                         element.items?.map(item => (
-                                            <span className="plan-item" key={item.id}>
+                                            <div className="plan-item" key={item.id}>
                                                 <Checkbox onChange={() => onChange(element.id, item.id)} checked={item.isFinish}>
                                                     {item.text}
                                                 </Checkbox>
-                                            </span>
+                                                <div>
+                                                    <ItemEditModal
+                                                        type="edit"
+                                                        id={item.id}
+                                                        planId={element.id}
+                                                        text={item.text}
+                                                    />
+                                                    <Popconfirm
+                                                        title="你确定要移除这个条目吗?"
+                                                        onConfirm={() => handleDelete(`/items/${item.id}`)}
+                                                        okText="确定"
+                                                        cancelText="取消"
+                                                    >
+                                                        <DeleteTwoTone />
+                                                    </Popconfirm>
+                                                </div>
+                                            </div>
                                         ))
                                     }
+                                    <div className="plan-date">
+                                        {`${new Date(element.startAt.substring(0, 10)).getFullYear()}年${new Date(element.startAt.substring(0, 10)).getMonth() + 1}月${new Date(element.startAt.substring(0, 10)).getDate()}日 - ${new Date(element.deadline.substring(0, 10)).getFullYear()}年${new Date(element.deadline.substring(0, 10)).getMonth() + 1}月${new Date(element.deadline.substring(0, 10)).getDate()}日`}
+                                    </div>
                                 </div>
                             </Card>
                         </Col>

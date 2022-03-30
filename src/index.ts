@@ -106,6 +106,25 @@ ipcMain.handle("patch", async (event, path, body, token) => {
   })
 })
 
+ipcMain.handle("delete", async (event, path, token) => {
+  return new Promise((resolve, reject) => {
+    const request = net.request({
+      method: "DELETE",
+      protocol,
+      hostname,
+      port,
+      path,
+    })
+    request.on("response", (response) => {
+      response.on('data', (chunk) => {
+        resolve(JSON.parse(chunk.toString()));
+      })
+    })
+    token && request.setHeader("Authorization", `Bearer ${token}`);
+    request.end();
+  })
+})
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();

@@ -1,6 +1,6 @@
 import { Button, Input, Modal, DatePicker } from "antd";
 import React, { FC, ReactElement, useEffect, useState } from "react";
-import { PlusCircleFilled, EditOutlined } from "@ant-design/icons";
+import { PlusCircleFilled, FormOutlined } from "@ant-design/icons";
 import moment from 'moment';
 import "./index.css";
 import { useNavigate } from "react-router-dom";
@@ -84,7 +84,7 @@ const PlanEditModal: FC<IProps> = (props: IProps): ReactElement => {
     return (
         <>
             {
-                props.type === "add" ? <PlusCircleFilled onClick={showModal} style={{ fontSize: "24px" }} /> : <EditOutlined onClick={showModal} />
+                props.type === "add" ? <PlusCircleFilled onClick={showModal} style={{ fontSize: "24px" }} /> : <FormOutlined onClick={showModal} />
             }
             <Modal
                 visible={visible}
