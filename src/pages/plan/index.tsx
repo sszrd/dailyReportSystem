@@ -12,7 +12,7 @@ const Plan: FC = (): ReactElement => {
     const [plans, setPlans] = useState<IPlan[]>();
     const navigate = useNavigate();
 
-    useEffect(() => {
+    const getAllPlans = () => {
         ipcRenderer.invoke("get", "/plans", localStorage.getItem("token"))
             .then(response => {
                 if (response.code === 200) {
@@ -23,6 +23,10 @@ const Plan: FC = (): ReactElement => {
                     navigate("/login");
                 }
             })
+    }
+
+    useEffect(() => {
+        getAllPlans();
     }, [])
 
     const onChange = (planId: number, itemId: number) => {
@@ -44,7 +48,9 @@ const Plan: FC = (): ReactElement => {
     const handleDelete = (path: string) => {
         ipcRenderer.invoke("delete", path, localStorage.getItem("token"))
             .then(response => {
-                if (response.code === 401) {
+                if (response.code === 200) {
+                    getAllPlans();
+                } else if (response.code === 401) {
                     localStorage.removeItem("token");
                     ipcRenderer.send("goto login page");
                     navigate("/login");
@@ -55,7 +61,7 @@ const Plan: FC = (): ReactElement => {
     return (
         <div className="site-card-wrapper" >
             <div className="btn-plan-add">
-                <PlanEditModal type="add" />
+                <PlanEditModal type="add" refresh={getAllPlans} />
             </div>
             <Row gutter={16}>
                 {
@@ -70,11 +76,13 @@ const Plan: FC = (): ReactElement => {
                                         date={{ start: element.startAt, end: element.deadline }}
                                         id={element.id}
                                         key="edit"
+                                        refresh={getAllPlans}
                                     />,
                                     <ItemEditModal
                                         type="add"
                                         planId={element.id}
                                         key="plus"
+                                        refresh={getAllPlans}
                                     />,
                                     <Popconfirm
                                         title="你确定要移除这个计划吗?"
@@ -100,6 +108,7 @@ const Plan: FC = (): ReactElement => {
                                                         id={item.id}
                                                         planId={element.id}
                                                         text={item.text}
+                                                        refresh={getAllPlans}
                                                     />
                                                     <Popconfirm
                                                         title="你确定要移除这个条目吗?"

@@ -11,7 +11,8 @@ interface IProps {
     type: "edit" | "add",
     id?: number,
     target?: string,
-    date?: IDate
+    date?: IDate,
+    refresh:()=>void
 }
 
 interface IDate {
@@ -58,7 +59,9 @@ const PlanEditModal: FC<IProps> = (props: IProps): ReactElement => {
             deadline: date.end
         }, localStorage.getItem("token"))
             .then(response => {
-                if (response.code === 401) {
+                if(response.code===200){
+                    props.refresh();
+                }else if (response.code === 401) {
                     localStorage.removeItem("token");
                     ipcRenderer.send("goto login page");
                     navigate("/login");

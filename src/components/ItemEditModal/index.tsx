@@ -8,7 +8,8 @@ interface IProps {
     type: "edit" | "add",
     id?: number,
     planId: number,
-    text?: string
+    text?: string,
+    refresh: () => void
 }
 
 const ItemEditModal: FC<IProps> = (props: IProps): ReactElement => {
@@ -40,7 +41,9 @@ const ItemEditModal: FC<IProps> = (props: IProps): ReactElement => {
             planId: props.planId
         }, localStorage.getItem("token"))
             .then(response => {
-                if (response.code === 401) {
+                if (response.code === 200) {
+                    props.refresh();
+                } else if (response.code === 401) {
                     localStorage.removeItem("token");
                     ipcRenderer.send("goto login page");
                     navigate("/login");
