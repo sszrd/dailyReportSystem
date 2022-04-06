@@ -8,12 +8,14 @@ const { ipcRenderer } = window.require("electron");
 
 const Report: FC = (): ReactElement => {
     const navigate = useNavigate();
+    const [allReports, setAllReports] = useState<IReport[]>([]);
     const [reports, setReports] = useState<IReport[]>([]);
 
     useEffect(() => {
         ipcRenderer.invoke("get", "/reports", localStorage.getItem("token"))
             .then(response => {
                 if (response.code === 200) {
+                    setAllReports(Object.values(response.result));
                     setReports(Object.values(response.result));
                 } else if (response.code === 401) {
                     localStorage.removeItem("token");
@@ -24,7 +26,12 @@ const Report: FC = (): ReactElement => {
     }, []);
 
     const onChange = (date: any, dateString: any) => {
-        console.log(date, dateString);
+        if (!dateString) {
+            setReports(allReports);
+        } else {
+            const newReports: IReport[] = allReports.filter((report) => report.createdAt.substring(0, 10) === dateString);
+            setReports(newReports);
+        }
     }
 
     const handleEdit = (report: IReport) => {
