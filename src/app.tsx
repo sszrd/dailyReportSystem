@@ -8,6 +8,7 @@ import Login from './pages/login';
 import Plan from './pages/plan';
 import Report from './pages/report';
 import Detail from './pages/detail';
+import Statistics from './pages/statistics';
 
 const App: FC = (): ReactElement => {
   return (
@@ -20,8 +21,7 @@ const App: FC = (): ReactElement => {
           <Route path="plan" element={<Plan />} />
           <Route path="report" element={<Report />} />
           <Route path="detail" element={<Detail />} />
-          <Route path="statistics" element={<div>statistics</div>} />
-          <Route path="user" element={<div>user</div>} />
+          <Route path="statistics" element={<Statistics />} />
           <Route path="*" element={<Navigate to="/frame/home" />} />
         </Route>
         <Route path="/login" element={<Login />} />

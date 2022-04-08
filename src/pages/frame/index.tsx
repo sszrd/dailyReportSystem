@@ -47,9 +47,6 @@ const Frame: FC = (): ReactElement => {
                     <Menu.Item key="4" icon={<LineChartOutlined />} onClick={() => navigate("/frame/statistics")}>
                         数据统计
                     </Menu.Item>
-                    <Menu.Item key="5" icon={<UserOutlined />} onClick={() => navigate("/frame/user")}>
-                        个人中心
-                    </Menu.Item>
                 </Menu>
             </Sider>
             <Layout className="site-layout">
