@@ -3,12 +3,6 @@
     flex-direction: column;
 }
 
-.plan-date {
-    font-size: 12px;
-    text-align: center;
-    font-weight: bold;
-}
-
 .btn-plan-add {
     margin-bottom: 12px;
     display: flex;

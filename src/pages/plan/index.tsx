@@ -1,12 +1,14 @@
 import React, { FC, ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { Card, Checkbox, Col, Popconfirm, Row } from 'antd';
+import { Card, Checkbox, Col, Popconfirm, Row, DatePicker } from 'antd';
 import { IPlan } from "../../constant/typings";
 import { useNavigate } from "react-router-dom";
 import PlanEditModal from "../../components/planEditModal";
 import ItemEditModal from "../../components/ItemEditModal";
 import { DeleteOutlined, DeleteTwoTone } from '@ant-design/icons';
+import moment from "moment";
 const { ipcRenderer } = window.require("electron");
+const { RangePicker } = DatePicker;
 
 const Plan: FC = (): ReactElement => {
     const [plans, setPlans] = useState<IPlan[]>();
@@ -23,6 +25,11 @@ const Plan: FC = (): ReactElement => {
                     navigate("/login");
                 }
             })
+    }
+
+    const updateProgress = (plan: IPlan) => {
+        const progress = plan.items.reduce((prev, cur) => prev + Number(cur.isFinish), 0) / plan.items.length;
+        ipcRenderer.invoke("patch", `/plans/${plan.id}`, { progress }, localStorage.getItem("token"));
     }
 
     useEffect(() => {
@@ -42,6 +49,9 @@ const Plan: FC = (): ReactElement => {
                     ipcRenderer.send("goto login page");
                     navigate("/login");
                 }
+            })
+            .then(() => {
+                updateProgress(plan);
             })
     }
 
@@ -122,9 +132,10 @@ const Plan: FC = (): ReactElement => {
                                             </div>
                                         ))
                                     }
-                                    <div className="plan-date">
-                                        {`${new Date(element.startAt.substring(0, 10)).getFullYear()}年${new Date(element.startAt.substring(0, 10)).getMonth() + 1}月${new Date(element.startAt.substring(0, 10)).getDate()}日 - ${new Date(element.deadline.substring(0, 10)).getFullYear()}年${new Date(element.deadline.substring(0, 10)).getMonth() + 1}月${new Date(element.deadline.substring(0, 10)).getDate()}日`}
-                                    </div>
+                                    <RangePicker
+                                        defaultValue={[moment(element.startAt.substring(0, 10), 'YYYY-MM-DD'), moment(element.deadline.substring(0, 10), 'YYYY-MM-DD')]}
+                                        disabled
+                                    />
                                 </div>
                             </Card>
                         </Col>
