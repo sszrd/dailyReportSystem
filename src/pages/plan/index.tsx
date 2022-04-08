@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useEffect, useState } from "react";
+import React, { FC, ReactElement, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { Card, Checkbox, Col, Popconfirm, Row, DatePicker } from 'antd';
 import { IPlan } from "../../constant/typings";
@@ -26,6 +26,12 @@ const Plan: FC = (): ReactElement => {
                 }
             })
     }
+
+    const curPlan: IPlan = useMemo(() => plans?.filter(plan =>
+        new Date().getTime() >= new Date(plan.startAt).getTime() &&
+        new Date().getTime() <= new Date(plan.deadline).getTime())[0],
+        [plans]
+    );
 
     const updateProgress = (plan: IPlan) => {
         const progress = plan.items.reduce((prev, cur) => prev + Number(cur.isFinish), 0) / plan.items.length;
@@ -71,7 +77,18 @@ const Plan: FC = (): ReactElement => {
     return (
         <div className="site-card-wrapper" >
             <div className="btn-plan-add">
-                <PlanEditModal type="add" refresh={getAllPlans} />
+                {
+                    curPlan ?
+                        <PlanEditModal type="edit"
+                            target={curPlan.target}
+                            date={{ start: curPlan.startAt, end: curPlan.deadline }}
+                            id={curPlan.id}
+                            refresh={getAllPlans}
+                            large
+                        />
+                        :
+                        <PlanEditModal type="add" refresh={getAllPlans} large />
+                }
             </div>
             <Row gutter={16}>
                 {
@@ -133,7 +150,7 @@ const Plan: FC = (): ReactElement => {
                                         ))
                                     }
                                     <RangePicker
-                                        defaultValue={[moment(element.startAt.substring(0, 10), 'YYYY-MM-DD'), moment(element.deadline.substring(0, 10), 'YYYY-MM-DD')]}
+                                        value={[moment(element.startAt.substring(0, 10), 'YYYY-MM-DD'), moment(element.deadline.substring(0, 10), 'YYYY-MM-DD')]}
                                         disabled
                                     />
                                 </div>

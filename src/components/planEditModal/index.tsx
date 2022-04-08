@@ -1,6 +1,6 @@
 import { Button, Input, Modal, DatePicker } from "antd";
 import React, { FC, ReactElement, useEffect, useState } from "react";
-import { PlusCircleFilled, FormOutlined } from "@ant-design/icons";
+import { PlusSquareOutlined, FormOutlined } from "@ant-design/icons";
 import moment from 'moment';
 import "./index.css";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,8 @@ interface IProps {
     id?: number,
     target?: string,
     date?: IDate,
-    refresh:()=>void
+    large?: true
+    refresh: () => void
 }
 
 interface IDate {
@@ -59,9 +60,9 @@ const PlanEditModal: FC<IProps> = (props: IProps): ReactElement => {
             deadline: date.end
         }, localStorage.getItem("token"))
             .then(response => {
-                if(response.code===200){
+                if (response.code === 200) {
                     props.refresh();
-                }else if (response.code === 401) {
+                } else if (response.code === 401) {
                     localStorage.removeItem("token");
                     ipcRenderer.send("goto login page");
                     navigate("/login");
@@ -87,7 +88,8 @@ const PlanEditModal: FC<IProps> = (props: IProps): ReactElement => {
     return (
         <>
             {
-                props.type === "add" ? <PlusCircleFilled onClick={showModal} style={{ fontSize: "24px" }} /> : <FormOutlined onClick={showModal} />
+                props.type === "add" ? <PlusSquareOutlined onClick={showModal} style={props.large ? { fontSize: "18px" } : {}} /> :
+                    <FormOutlined onClick={showModal} style={props.large ? { fontSize: "18px" } : {}} />
             }
             <Modal
                 visible={visible}
@@ -120,6 +122,7 @@ const PlanEditModal: FC<IProps> = (props: IProps): ReactElement => {
                     <RangePicker
                         showTime
                         value={[moment(date.start, "YYYY/MM/DD"), moment(date.end, "YYYY/MM/DD")]}
+                        disabled={[true, false]}
                         onChange={handleDateChange}
                         className="plan-edit-input"
                     />
