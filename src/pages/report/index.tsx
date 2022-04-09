@@ -1,15 +1,16 @@
 import "./index.css";
-import React, { FC, ReactElement, useEffect, useState } from "react";
+import React, { FC, ReactElement, useEffect, useMemo, useState } from "react";
 import { List, Typography, DatePicker, Button } from 'antd';
 import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import { IReport } from "../../constant/typings";
+import { IPlan, IReport } from "../../constant/typings";
 const { ipcRenderer } = window.require("electron");
 
 const Report: FC = (): ReactElement => {
     const navigate = useNavigate();
     const [allReports, setAllReports] = useState<IReport[]>([]);
     const [reports, setReports] = useState<IReport[]>([]);
+    const [plans, setPlans] = useState<IPlan[]>([]);
 
     useEffect(() => {
         ipcRenderer.invoke("get", "/reports", localStorage.getItem("token"))
@@ -25,6 +26,25 @@ const Report: FC = (): ReactElement => {
             })
     }, []);
 
+    useEffect(() => {
+        ipcRenderer.invoke("get", "/plans", localStorage.getItem("token"))
+            .then(response => {
+                if (response.code === 200) {
+                    setPlans(Object.values(response.result));
+                } else if (response.code === 401) {
+                    localStorage.removeItem("token");
+                    ipcRenderer.send("goto login page");
+                    navigate("/login");
+                }
+            })
+    }, [])
+
+    const curPlan: IPlan = useMemo(() => plans?.filter(plan =>
+        new Date().getTime() >= new Date(plan.startAt).getTime() &&
+        new Date().getTime() <= new Date(plan.deadline).getTime())[0],
+        [plans]
+    );
+
     const onChange = (date: any, dateString: any) => {
         if (!dateString) {
             setReports(allReports);
@@ -38,11 +58,16 @@ const Report: FC = (): ReactElement => {
         navigate("/frame/detail", { state: { type: "edit", report } });
     }
 
-    const handleDelete = (id: number) => {
-        ipcRenderer.invoke("delete", `/reports/${id}`, localStorage.getItem("token"))
+    const handleDelete = (item: IReport) => {
+        ipcRenderer.invoke("delete", `/reports/${item.id}`, localStorage.getItem("token"))
             .then(response => {
                 if (response.code === 200) {
-                    setReports(reports.filter(report => report.id !== id));
+                    setReports(reports.filter(report => report.id !== item.id));
+                    ipcRenderer.invoke("patch",
+                        `/plans/${curPlan.id}`,
+                        { totalTime: curPlan.totalTime - item.time },
+                        localStorage.getItem("token")
+                    )
                 } else if (response.code === 401) {
                     localStorage.removeItem("token");
                     ipcRenderer.send("goto login page");
@@ -76,7 +101,7 @@ const Report: FC = (): ReactElement => {
                     <span>{item.title}</span>
                     <div className="report-list-button-group">
                         <EditTwoTone onClick={() => handleEdit(item)} />
-                        <DeleteTwoTone onClick={() => handleDelete(item.id)} />
+                        <DeleteTwoTone onClick={() => handleDelete(item)} />
                     </div>
                 </List.Item>
             )}

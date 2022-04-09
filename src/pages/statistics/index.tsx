@@ -30,10 +30,10 @@ const Statistics: FC = (): ReactElement => {
     const progressPieValue: number[] = useMemo(() => [curPlan?.progress, 1 - curPlan?.progress], [curPlan]);
     const totalTime: number = useMemo(() => curPlan?.totalTime, [curPlan]);
     const willTime: number = useMemo(() => {
-        if (curPlan?.totalTime === 0) {
+        if (curPlan?.totalTime === 0 || curPlan?.progress === 0) {
             return ((new Date(curPlan.deadline).getTime() - new Date(curPlan.startAt).getTime()) / (24 * 60 * 60 * 1000)) * 8;
         }
-        return curPlan?.totalTime / curPlan?.progress
+        return curPlan?.totalTime / curPlan?.progress;
     }, [totalTime, curPlan]);
 
     const Values: { weekBarValue: number[], timeLineValue: number[], percentLineValue: number[] } = useMemo(() => {

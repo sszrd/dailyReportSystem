@@ -2,7 +2,7 @@ import { FC, ReactElement, useCallback, useEffect, useMemo, useState } from "rea
 import { Calendar, Badge } from 'antd';
 import React from "react";
 import "./index.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IReport } from "../../constant/typings";
 const { ipcRenderer } = window.require("electron");
 
@@ -66,11 +66,12 @@ const Home: FC = (): ReactElement => {
 
     const dateCellRender = useCallback((value: moment.Moment) => {
         const listData = getListData(value);
+        const report = response.filter(item => item.createdAt.substring(0, 10) === value.format('YYYY-MM-DD'))[0];
         return (
             <ul className="events">
                 {listData.map(item => (
                     <li key={item.content}>
-                        <Badge status={item.type} text={item.content} />
+                        <Link to={{ pathname: "/frame/detail" }} state={{ type: "edit", report }}><Badge status={item.type} text={item.content} /></Link>
                     </li>
                 ))}
             </ul>
