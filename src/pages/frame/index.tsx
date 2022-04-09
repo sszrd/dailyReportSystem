@@ -3,20 +3,21 @@ import { Layout, Menu } from 'antd';
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
-    UserOutlined,
     HomeOutlined,
     FileAddOutlined,
     FileSearchOutlined,
-    LineChartOutlined
+    LineChartOutlined,
 } from '@ant-design/icons';
 import "./index.css";
 import { Outlet, useNavigate } from "react-router-dom";
+import User from "../../components/user";
 const { ipcRenderer } = window.require("electron");
 
 const { Header, Sider, Content } = Layout;
 
 const Frame: FC = (): ReactElement => {
     const [collapsed, setCollapsed] = useState<boolean>(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,7 +34,7 @@ const Frame: FC = (): ReactElement => {
     return (
         <Layout>
             <Sider trigger={null} collapsible collapsed={collapsed}>
-                <div className="logo" />
+                <User />
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
                     <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate("/frame/home")}>
                         主页

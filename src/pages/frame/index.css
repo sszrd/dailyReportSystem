@@ -25,5 +25,17 @@
 }
 
 .ant-layout-sider-children .logo {
-  height: 84px;
+  height: 136px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 48px;
+  transform: translateY(8px);
+}
+
+.logo-username{
+  margin-top: 8px;
+  font-size: 14px;
 }
