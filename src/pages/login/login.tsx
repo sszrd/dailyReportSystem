@@ -18,6 +18,7 @@ const Login: FC<IProps> = (props: IProps): ReactElement => {
         const response = await ipcRenderer.invoke("post", "/users/login", values);
         if (response.code === 200) {
             localStorage.setItem("token", response.result.token);
+            localStorage.setItem("username", response.result.username);
             navigate("/frame");
             ipcRenderer.send("goto home page");
         } else {
