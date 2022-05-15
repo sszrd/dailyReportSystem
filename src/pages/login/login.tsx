@@ -19,6 +19,8 @@ const Login: FC<IProps> = (props: IProps): ReactElement => {
         if (response.code === 200) {
             localStorage.setItem("token", response.result.token);
             localStorage.setItem("username", response.result.username);
+            localStorage.setItem("teamId", response.result.teamId);
+            localStorage.setItem("isAdmin", response.result.isadmin);
             navigate("/frame");
             ipcRenderer.send("goto home page");
         } else {

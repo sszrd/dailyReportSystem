@@ -1,61 +1,77 @@
-import "./index.css";
-import React, { FC, ReactElement, useEffect, useMemo, useState } from "react";
-import { List, Typography, DatePicker, Button } from 'antd';
+import React, { FC, ReactElement, useEffect, useState } from "react";
+import { DatePicker, Button, Space, Table, Tag } from 'antd';
 import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import { IPlan, IReport } from "../../constant/typings";
+import { IReport, ITeam } from "../../constant/typings";
 const { ipcRenderer } = window.require("electron");
+
+interface ITeamReport extends IReport {
+    username: string
+}
 
 const Report: FC = (): ReactElement => {
     const navigate = useNavigate();
-    const [allReports, setAllReports] = useState<IReport[]>([]);
-    const [reports, setReports] = useState<IReport[]>([]);
-    const [plans, setPlans] = useState<IPlan[]>([]);
+    const [allReports, setAllReports] = useState<ITeamReport[]>([]);
+    const [reports, setReports] = useState<ITeamReport[]>([]);
+    const [team, setTeam] = useState<ITeam>(null);
+
+    const isManager = team ? team.teamManager.username === localStorage.getItem("username") : false;
 
     useEffect(() => {
-        ipcRenderer.invoke("get", "/reports", localStorage.getItem("token"))
-            .then(response => {
-                if (response.code === 200) {
-                    setAllReports(Object.values(response.result));
-                    setReports(Object.values(response.result));
-                } else if (response.code === 401) {
-                    localStorage.removeItem("token");
-                    ipcRenderer.send("goto login page");
-                    navigate("/login");
-                }
+        if (isManager) {
+            const reports: ITeamReport[] = [];
+            team.teamMembers.forEach(member => {
+                member.reports.forEach(report => {
+                    const username = member.username;
+                    const teamReport: ITeamReport = { ...report, username }
+                    reports.push(teamReport);
+                })
             })
+            setAllReports(reports);
+            setReports(reports);
+        }
+    }, [team])
+
+    const getAllReports = async () => {
+        const response = await ipcRenderer.invoke("get", "/reports", localStorage.getItem("token"));
+        if (response.code === 200) {
+            setAllReports(response.result);
+            setReports(response.result);
+        } else if (response.code === 401) {
+            localStorage.removeItem("token");
+            ipcRenderer.send("goto login page");
+            navigate("/login");
+        }
+    }
+
+    const getTeam = async () => {
+        const response = await ipcRenderer.invoke("get", `/teams/${localStorage.getItem("teamId")}`, localStorage.getItem("token"));
+        if (response.code === 200) {
+            setTeam(response.result);
+        } else if (response.code === 401) {
+            localStorage.removeItem("token");
+            ipcRenderer.send("goto login page");
+            navigate("/login");
+        }
+    }
+
+    useEffect(() => {
+        getAllReports();
+        getTeam();
     }, []);
-
-    useEffect(() => {
-        ipcRenderer.invoke("get", "/plans", localStorage.getItem("token"))
-            .then(response => {
-                if (response.code === 200) {
-                    setPlans(Object.values(response.result));
-                } else if (response.code === 401) {
-                    localStorage.removeItem("token");
-                    ipcRenderer.send("goto login page");
-                    navigate("/login");
-                }
-            })
-    }, [])
-
-    const curPlan: IPlan = useMemo(() => plans?.filter(plan =>
-        new Date().getTime() >= new Date(plan.startAt).getTime() &&
-        new Date().getTime() <= new Date(plan.deadline).getTime())[0],
-        [plans]
-    );
 
     const onChange = (date: any, dateString: any) => {
         if (!dateString) {
             setReports(allReports);
         } else {
-            const newReports: IReport[] = allReports.filter((report) => report.createdAt.substring(0, 10) === dateString);
+            const newReports: ITeamReport[] = allReports.filter((report) =>
+                new Date(new Date(report.createdAt).getTime() + 8 * 60 * 60 * 1000).toJSON().substring(0, 10) === dateString);
             setReports(newReports);
         }
     }
 
     const handleEdit = (report: IReport) => {
-        navigate("/frame/detail", { state: { type: "edit", report } });
+        navigate("/frame/editReport", { state: { type: "edit", report } });
     }
 
     const handleDelete = (item: IReport) => {
@@ -63,11 +79,6 @@ const Report: FC = (): ReactElement => {
             .then(response => {
                 if (response.code === 200) {
                     setReports(reports.filter(report => report.id !== item.id));
-                    ipcRenderer.invoke("patch",
-                        `/plans/${curPlan.id}`,
-                        { totalTime: curPlan.totalTime - item.time },
-                        localStorage.getItem("token")
-                    )
                 } else if (response.code === 401) {
                     localStorage.removeItem("token");
                     ipcRenderer.send("goto login page");
@@ -76,36 +87,76 @@ const Report: FC = (): ReactElement => {
             })
     }
 
-    const gotoDetail = () => {
-        const report = reports.filter(report => report.createdAt.substring(0, 10) === new Date().toJSON().substring(0, 10))[0];
+    const gotoEditReport = () => {
+        const report = reports.filter(report =>
+            new Date(new Date(report.createdAt).getTime() + 8 * 60 * 60 * 1000).toJSON().substring(0, 10) ===
+            new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toJSON().substring(0, 10)
+        )[0];
         if (report) {
-            navigate("/frame/detail", { state: { type: "edit", report } });
+            navigate("/frame/editReport", { state: { type: "edit", report } });
         } else {
-            navigate("/frame/detail", { state: { type: "add" } });
+            navigate("/frame/editReport", { state: { type: "add" } });
         }
     };
 
+    const columns = [
+        {
+            title: '创建日期',
+            dataIndex: ["createdAt"],
+            key: "createdAt",
+            align: "center" as "center",
+            render: (createdAt: string) => <Tag color="blue">
+                {new Date(new Date(createdAt).getTime() + 8 * 60 * 60 * 1000).toJSON().substring(0, 10)}
+            </Tag>,
+        },
+        {
+            title: '作者',
+            dataIndex: isManager ? ["username"] : [],
+            key: "username",
+            align: "center" as "center",
+            render: (username: string) => isManager ? <span>{username}</span> : localStorage.getItem("username"),
+        },
+        {
+            title: '标题',
+            dataIndex: ["title"],
+            key: "title",
+            align: "center" as "center",
+            render: (title: string) => <span>{title}</span>,
+        },
+        {
+            title: '操作',
+            key: 'operation',
+            align: "center" as "center",
+            render: (report: ITeamReport) => (
+                <div style={{ display: "flex", justifyContent: "space-evenly" }}>
+                    <EditTwoTone onClick={() => handleEdit(report)} />
+                    <DeleteTwoTone onClick={() => handleDelete(report)} />
+                </div >
+            )
+        },
+    ];
+
     return (
-        <List
-            header={
-                <div className="report-list-header">
-                    <DatePicker onChange={onChange} />
-                    <Button type="primary" onClick={gotoDetail}>编辑今日日报</Button>
-                </div>
-            }
-            bordered
-            dataSource={reports}
-            renderItem={item => (
-                <List.Item>
-                    <Typography.Text mark>{item.createdAt.substring(0, 10)}</Typography.Text>
-                    <span>{item.title}</span>
-                    <div className="report-list-button-group">
-                        <EditTwoTone onClick={() => handleEdit(item)} />
-                        <DeleteTwoTone onClick={() => handleDelete(item)} />
-                    </div>
-                </List.Item>
-            )}
-        />
+        <>
+            <Space style={{ marginBottom: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <DatePicker onChange={onChange} />
+                {isManager || <Button type="primary" onClick={gotoEditReport}>编辑今日日报</Button>}
+            </Space>
+            <Table
+                columns={isManager ? columns.slice(0, columns.length - 1) : columns}
+                dataSource={reports}
+                rowKey={(report: ITeamReport) => report.id}
+                onRow={(report: ITeamReport) => {
+                    return {
+                        onClick: () => navigate("/frame/detail", {
+                            state: {
+                                ...report, username: isManager ? report.username : localStorage.getItem("username")
+                            }
+                        })
+                    }
+                }}
+            />
+        </>
     )
 }
 

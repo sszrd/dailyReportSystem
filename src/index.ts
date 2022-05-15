@@ -17,8 +17,8 @@ const createWindow = (): BrowserWindow => {
     }
   });
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  //mainWindow.setMenu(null);
-  mainWindow.webContents.openDevTools();
+  mainWindow.setMenu(null);
+  //mainWindow.webContents.openDevTools();
   return mainWindow;
 };
 
@@ -26,12 +26,15 @@ app.on('ready', () => {
   mainWindow = createWindow();
 
   ipcMain.on("goto login page", () => {
+    if (mainWindow.isMaximizable()) {
+      mainWindow.unmaximize();
+    }
     mainWindow.setSize(300, 600);
     mainWindow.setResizable(false);
   })
 
   ipcMain.on("goto home page", () => {
-    mainWindow.setSize(1200, 900);
+    mainWindow.setSize(1080, 810);
     mainWindow.setResizable(true);
   })
 

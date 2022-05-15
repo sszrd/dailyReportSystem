@@ -1,8 +1,8 @@
 {
-  "name": "electron-react-demo",
-  "productName": "electron-react-demo",
+  "name": "daily-report-system",
+  "productName": "daily-report-system",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "electron app",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -73,6 +73,7 @@
     "@vercel/webpack-asset-relocator-loader": "1.7.0",
     "css-loader": "^6.0.0",
     "electron": "16.0.5",
+    "electron-packager": "^15.5.1",
     "eslint": "^7.6.0",
     "eslint-plugin-import": "^2.20.0",
     "fork-ts-checker-webpack-plugin": "^6.0.1",

@@ -15,17 +15,19 @@ const Home: FC = (): ReactElement => {
     const [response, setResponse] = useState<IReport[]>([]);
     const navigate = useNavigate();
 
+    const getAllResponses = async () => {
+        const response = await ipcRenderer.invoke("get", "/reports", localStorage.getItem("token"));
+        if (response.code === 200) {
+            setResponse(Object.values(response.result));
+        } else if (response.code === 401) {
+            localStorage.removeItem("token");
+            ipcRenderer.send("goto login page");
+            navigate("/login");
+        }
+    }
+
     useEffect(() => {
-        ipcRenderer.invoke("get", "/reports", localStorage.getItem("token"))
-            .then(response => {
-                if (response.code === 200) {
-                    setResponse(Object.values(response.result));
-                } else if (response.code === 401) {
-                    localStorage.removeItem("token");
-                    ipcRenderer.send("goto login page");
-                    navigate("/login");
-                }
-            })
+        getAllResponses();
     }, [])
 
     const monthTotal: Map<string, number> = useMemo(() => {
@@ -45,7 +47,8 @@ const Home: FC = (): ReactElement => {
         let listData: IListData[] = [];
         const currentDate = value.format('YYYY-MM-DD');
         for (let each of response) {
-            if (each.createdAt.substring(0, 10) === currentDate) {
+            const eachDate = new Date(new Date(each.createdAt).getTime() + 8 * 60 * 60 * 1000).toJSON().substring(0, 10);
+            if (eachDate === currentDate) {
                 if (each.finish) {
                     listData.push({
                         type: 'success',
@@ -66,12 +69,17 @@ const Home: FC = (): ReactElement => {
 
     const dateCellRender = useCallback((value: moment.Moment) => {
         const listData = getListData(value);
-        const report = response.filter(item => item.createdAt.substring(0, 10) === value.format('YYYY-MM-DD'))[0];
+        const report = response.filter(item =>
+            new Date(new Date(item.createdAt).getTime() + 8 * 60 * 60 * 1000).toJSON().substring(0, 10) ===
+            value.format('YYYY-MM-DD')
+        )[0];
         return (
             <ul className="events">
                 {listData.map(item => (
-                    <li key={item.content}>
-                        <Link to={{ pathname: "/frame/detail" }} state={{ type: "edit", report }}><Badge status={item.type} text={item.content} /></Link>
+                    <li key={item.type + item.content}>
+                        <Link to={{ pathname: "/frame/detail" }} state={{ ...report, username: localStorage.getItem("username") }}>
+                            <Badge status={item.type} text={item.content} />
+                        </Link>
                     </li>
                 ))}
             </ul>

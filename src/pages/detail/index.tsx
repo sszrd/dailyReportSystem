@@ -1,188 +1,67 @@
-import { IPlan, IReport } from "../../constant/typings";
-import React, { FC, ReactElement, useEffect, useMemo, useState } from "react";
+import { PageHeader, Button, Descriptions } from 'antd';
+import { IReport, ITask, ITeam } from '../../constant/typings';
+import React, { useEffect, useState } from 'react';
+import { FC, ReactElement } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import "./index.css";
-import { Button, Form, Input, Modal, Slider } from "antd";
-import TextArea from "antd/lib/input/TextArea";
-import { useLocation, useNavigate } from "react-router-dom";
+
 const { ipcRenderer } = window.require("electron");
 
-interface IState {
-    type: "add" | "edit",
-    report?: IReport
+interface ITeamReport extends IReport {
+    username: string
 }
 
 const Detail: FC = (): ReactElement => {
-    const [plans, setPlans] = useState<IPlan[]>([]);
     const navigate = useNavigate();
-    const state = useLocation().state as IState;
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const report = useLocation().state as ITeamReport;
+    const [task, setTask] = useState<ITask>(null);
 
-    const showModal = () => {
-        setIsModalVisible(true);
-    };
-
-    const handleOk = () => {
-        navigate("/frame/plan");
-        setIsModalVisible(false);
-    };
-
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-
-    useEffect(() => {
-        ipcRenderer.invoke("get", "/plans", localStorage.getItem("token"))
-            .then(response => {
-                if (response.code === 200) {
-                    setPlans(Object.values(response.result));
-                } else if (response.code === 401) {
-                    localStorage.removeItem("token");
-                    ipcRenderer.send("goto login page");
-                    navigate("/login");
-                }
-            })
-    }, [])
-
-    const curPlan: IPlan = useMemo(() => plans?.filter(plan =>
-        new Date().getTime() >= new Date(plan.startAt).getTime() &&
-        new Date().getTime() <= new Date(plan.deadline).getTime())[0],
-        [plans]
-    );
-
-    const onFinish = (values: any) => {
-        if (!curPlan) {
-            showModal();
-            return;
+    const getTask = async () => {
+        if (report.taskId) {
+            const response = await ipcRenderer.invoke("get", `/tasks/${report.taskId}`, localStorage.getItem("token"));
+            if (response.code === 200) {
+                setTask(response.result);
+            } else if (response.code === 401) {
+                localStorage.removeItem("token");
+                ipcRenderer.send("goto login page");
+                navigate("/login");
+            }
         }
-        switch (state.type) {
-            case "add":
-                Promise.all([
-                    ipcRenderer.invoke(
-                        "post",
-                        "/reports",
-                        values,
-                        localStorage.getItem("token")
-                    ),
-                    ipcRenderer.invoke("patch",
-                        `/plans/${curPlan.id}`,
-                        { totalTime: values.time + curPlan.totalTime },
-                        localStorage.getItem("token")
-                    )
-                ])
-                    .then(() => navigate("/frame/report"))
-                break;
-            case "edit":
-                Promise.all([
-                    ipcRenderer.invoke("patch",
-                        `/reports/${state.report.id}`,
-                        values,
-                        localStorage.getItem("token")
-                    ),
-                    ipcRenderer.invoke("patch",
-                        `/plans/${curPlan.id}`,
-                        { totalTime: values.time + curPlan.totalTime - state.report.time },
-                        localStorage.getItem("token")
-                    )
-                ])
-                    .then(() => navigate("/frame/report"))
-                break;
-            default:
-                break;
-        }
-    };
-
-    const formatter = (value: any) => {
-        return `${value}%`;
     }
 
+    useEffect(() => {
+        getTask();
+    }, [report.taskId])
+
+    const isOwnReport = report.username === localStorage.getItem("username");
+
     return (
-        <>
-            <Form
-                name="report_detail"
-                className="report-detail-form"
-                onFinish={onFinish}
-                initialValues={{
-                    title: state?.report?.title,
-                    finish: state?.report?.finish,
-                    unfinish: state?.report?.unfinish,
-                    thinking: state?.report?.thinking,
-                    percent: state?.report?.percent,
-                    time: state?.report?.time
-                }}
+        report &&
+        <div className="site-page-header-ghost-wrapper">
+            <PageHeader
+                ghost={false}
+                onBack={() => navigate(-1)}
+                title={report.title}
+                extra={isOwnReport ? [
+                    <Button key="1" type="primary" onClick={() => navigate("/frame/editReport", { state: { report, type: "edit" } })}>
+                        编辑
+                    </Button>,
+                ] : []}
             >
-                <div className="report-detail-label">标题</div>
-                <Form.Item
-                    name="title"
-                    rules={[{ required: true, message: '请输入标题!' }]}
-                >
-                    <Input placeholder="标题" />
-                </Form.Item>
-                <div className="report-detail-label">已完成</div>
-                <Form.Item
-                    name="finish"
-                >
-                    <TextArea
-                        placeholder="已完成项目"
-                        autoSize={{ minRows: 8 }}
-                    />
-                </Form.Item>
-                <div className="report-detail-label">未完成</div>
-                <Form.Item
-                    name="unfinish"
-                >
-                    <TextArea
-                        placeholder="未完成项目"
-                        autoSize={{ minRows: 8 }}
-                    />
-                </Form.Item>
-                <div className="report-detail-label">总结</div>
-                <Form.Item
-                    name="thinking"
-                >
-                    <TextArea
-                        placeholder="思考与总结"
-                        autoSize={{ minRows: 8 }}
-                    />
-                </Form.Item>
-                <div className="report-detail-label">完成率</div>
-                <Form.Item
-                    name="percent"
-                >
-                    <Slider
-                        tipFormatter={formatter}
-                    />
-                </Form.Item>
-                <div className="report-detail-label">用时</div>
-                <Form.Item
-                    name="time"
-                >
-                    <Slider
-                        min={0}
-                        max={24}
-                        tipFormatter={(value) => value}
-                    />
-                </Form.Item>
-                <Form.Item>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <Button type="default" className="report-form-button" onClick={() => navigate(-1)}>
-                            返回
-                        </Button>
-                        <Button type="primary" htmlType="submit" className="report-form-button">
-                            提交
-                        </Button>
-                    </div>
-                </Form.Item>
-            </Form>
-            <Modal title="提示"
-                visible={isModalVisible}
-                onOk={handleOk}
-                onCancel={handleCancel}
-                okText="确认"
-                cancelText="取消">
-                <p>当前时间还没有计划，是否创建计划？</p>
-            </Modal>
-        </>
-    );
-}
+                <Descriptions size="small" column={4} bordered>
+                    <Descriptions.Item label="作者" span={2}>{report.username}</Descriptions.Item>
+                    <Descriptions.Item label="创建时间" span={2}>
+                        {new Date(new Date(report.createdAt).getTime() + 8 * 60 * 60 * 1000).toJSON().substring(0, 10)}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="用时" span={2}>{`${report.time}h`}</Descriptions.Item>
+                    <Descriptions.Item label="所属任务" span={2}>{task?.target}</Descriptions.Item>
+                    <Descriptions.Item label="已完成" span={4}>{report.finish}</Descriptions.Item>
+                    <Descriptions.Item label="未完成" span={4}>{report.unfinish}</Descriptions.Item>
+                    <Descriptions.Item label="总结" span={4}>{report.thinking}</Descriptions.Item>
+                </Descriptions>
+            </PageHeader>
+        </div>
+    )
+};
 
 export default Detail;
