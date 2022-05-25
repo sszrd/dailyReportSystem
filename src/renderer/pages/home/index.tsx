@@ -3,7 +3,7 @@ import { Calendar, Badge } from 'antd';
 import React from "react";
 import "./index.css";
 import { Link, useNavigate } from "react-router-dom";
-import { IReport } from "../../constant/typings";
+import { IReport } from "../../../constant/typings";
 const { ipcRenderer } = window.require("electron");
 
 interface IListData {

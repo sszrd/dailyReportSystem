@@ -2,7 +2,7 @@ import { Button, Input, Modal, DatePicker, Form, Select } from "antd";
 import React, { FC, ReactElement, useState } from "react";
 import { PlusSquareOutlined, FormOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { ITask, ITeam } from "../../constant/typings";
+import { ITask, ITeam } from "../../../constant/typings";
 import moment from 'moment';
 
 const { RangePicker } = DatePicker;

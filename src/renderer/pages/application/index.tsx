@@ -2,7 +2,7 @@ import React, { FC, ReactElement, useEffect, useState } from "react";
 import { Table, Tag, Popconfirm } from 'antd';
 import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import { ITeam, IApplication } from "../../constant/typings";
+import { ITeam, IApplication } from "../../../constant/typings";
 
 const { ipcRenderer } = window.require("electron");
 

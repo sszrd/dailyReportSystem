@@ -69,9 +69,9 @@ const Frame: FC = (): ReactElement => {
 
     return (
         <Layout>
-            <Sider trigger={null} collapsible collapsed={collapsed}>
+            <Sider theme="light" trigger={null} collapsible collapsed={collapsed}>
                 <User />
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+                <Menu theme="light" mode="inline" defaultSelectedKeys={['1']}>
                     <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate("/frame/home")}>
                         主页
                     </Menu.Item>

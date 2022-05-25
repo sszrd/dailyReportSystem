@@ -1,4 +1,4 @@
-import { ITask, IReport } from "../../constant/typings";
+import { ITask, IReport } from "../../../constant/typings";
 import React, { FC, ReactElement, useEffect, useState } from "react";
 import { Button, Form, Input, Select, Slider } from "antd";
 import TextArea from "antd/lib/input/TextArea";

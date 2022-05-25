@@ -1,5 +1,5 @@
 import { app, BrowserWindow, dialog, ipcMain, net } from 'electron';
-import { hostname, port, protocol } from "./constant/env";
+import { hostname, port, protocol } from "../constant/env";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 let mainWindow: BrowserWindow;
 
@@ -10,7 +10,7 @@ if (require('electron-squirrel-startup')) {
 const createWindow = (): BrowserWindow => {
   const mainWindow = new BrowserWindow({
     width: 1200,
-    height: 900,
+    height: 810,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -34,7 +34,7 @@ app.on('ready', () => {
   })
 
   ipcMain.on("goto home page", () => {
-    mainWindow.setSize(1080, 810);
+    mainWindow.setSize(1200, 810);
     mainWindow.setResizable(true);
   })
 

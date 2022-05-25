@@ -30,12 +30,13 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: white;
+  color: "black";
   font-size: 48px;
   transform: translateY(8px);
 }
 
-.logo-username{
-  margin-top: 8px;
+.logo-username {
+  margin-top: 3px;
   font-size: 14px;
+  font-weight: bold;
 }

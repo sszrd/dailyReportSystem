@@ -1,7 +1,7 @@
 import * as echarts from 'echarts';
 import React, { FC, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { Button, Descriptions, Divider, PageHeader, Pagination, Select } from 'antd';
-import { IReport, ITeam, ITask } from "../../constant/typings";
+import { IReport, ITeam, ITask } from "../../../constant/typings";
 import { useNavigate } from "react-router-dom";
 const { ipcRenderer } = window.require("electron");
 

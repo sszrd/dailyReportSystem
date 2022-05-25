@@ -1,6 +1,6 @@
 import React, { FC, ReactElement, useEffect, useState } from "react";
 import { Card, Checkbox, Popconfirm, DatePicker, List, Tag, Button, Divider } from 'antd';
-import { ITask, ITeam } from "../../constant/typings";
+import { ITask, ITeam } from "../../../constant/typings";
 import { useNavigate } from "react-router-dom";
 import { DeleteOutlined, DeleteTwoTone } from '@ant-design/icons';
 import moment from "moment";
@@ -164,7 +164,7 @@ const Task: FC = (): ReactElement => {
 
     return (
         <List
-            grid={{ gutter: 16, column: 4 }}
+            grid={{ gutter: 16, column: 3 }}
             dataSource={
                 status === 0 ? tasks : status === 1 ?
                     tasks.filter(task => task.isFinish === true) :

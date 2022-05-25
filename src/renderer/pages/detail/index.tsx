@@ -1,5 +1,5 @@
 import { PageHeader, Button, Descriptions } from 'antd';
-import { IReport, ITask, ITeam } from '../../constant/typings';
+import { IReport, ITask, ITeam } from '../../../constant/typings';
 import React, { useEffect, useState } from 'react';
 import { FC, ReactElement } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';

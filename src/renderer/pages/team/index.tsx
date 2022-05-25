@@ -2,7 +2,7 @@ import React, { FC, ReactElement, useEffect, useMemo, useState } from "react";
 import { List, Button, Modal, Form, Input, Popconfirm, notification, Tag } from 'antd';
 import { UserDeleteOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import { ITeam } from "../../constant/typings";
+import { ITeam } from "../../../constant/typings";
 
 const { ipcRenderer } = window.require("electron");
 

@@ -1,5 +1,5 @@
 import React, { FC, ReactElement, useState } from "react";
-import { Button, Input, Modal, Popconfirm, Popover } from 'antd';
+import { Avatar, Button, Input, Modal, Popconfirm, Popover } from 'antd';
 import { KeyOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 const { ipcRenderer } = window.require("electron");
@@ -57,7 +57,7 @@ const User: FC = (): ReactElement => {
     return (
         <Popover content={content} title="用户操作" trigger="click" placement="right">
             <div className="logo" >
-                <UserOutlined />
+                <Avatar size={64} icon={<UserOutlined />} />
                 <div className="logo-username">
                     {localStorage.getItem("username")}
                 </div>

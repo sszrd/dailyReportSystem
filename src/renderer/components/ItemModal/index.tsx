@@ -2,7 +2,7 @@ import { Button, Input, Modal, Form } from "antd";
 import React, { FC, ReactElement, useState } from "react";
 import { PlusOutlined, EditTwoTone } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { IItem, ITask } from "../../constant/typings";
+import { IItem, ITask } from "../../../constant/typings";
 
 const { ipcRenderer } = window.require("electron");
 

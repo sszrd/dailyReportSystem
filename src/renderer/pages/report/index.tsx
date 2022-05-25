@@ -2,7 +2,7 @@ import React, { FC, ReactElement, useEffect, useState } from "react";
 import { DatePicker, Button, Space, Table, Tag } from 'antd';
 import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import { IReport, ITeam } from "../../constant/typings";
+import { IReport, ITeam } from "../../../constant/typings";
 const { ipcRenderer } = window.require("electron");
 
 interface ITeamReport extends IReport {
